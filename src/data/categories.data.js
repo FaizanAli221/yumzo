@@ -88,6 +88,15 @@ const categories = [
     color: "#C23B1C",
     createdAt: "2024-01-14T00:00:00.000Z",
   },
+  {
+    id: "cat_010",
+    slug: "nano-banana",
+    name: "Nano Banana",
+    tagline: "Golden & crisp",
+    description: "Ultra-thin, vacuum-fried ripe banana crisps with a natural honey-vanilla glaze.",
+    color: "#FFC23C",
+    createdAt: "2024-02-10T00:00:00.000Z",
+  },
 ];
 
 /** @returns {Promise<Array>} all categories */

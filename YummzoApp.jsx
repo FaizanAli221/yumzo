@@ -22,11 +22,16 @@ import {
   Flame,
   Coffee,
   Package,
-  ShoppingCart,
   CheckCircle2,
   AlertCircle,
   Loader2,
   Info,
+  Calendar,
+  MapPin,
+  Clock,
+  Ticket,
+  Star,
+  ShoppingBag,
 } from "lucide-react";
 import {
   fetchHealth,
@@ -36,11 +41,8 @@ import {
   submitContact,
 } from "./src/services/api";
 
-/**
- * YUMMZO FOODS — Brand Frontend with Live REST API Integration
- */
-
 const CATEGORY_STYLES = {
+  "nano-banana": { icon: Sparkles, bg: "#FFF4CE", chip: "#B88600" },
   "vegan-food": { icon: Leaf, bg: "#EAF3D8", chip: "#6B8E3A" },
   "energy-bites": { icon: Zap, bg: "#3A2A22", chip: "#FFC23C", dark: true },
   "flavoured-nuts": { icon: Nut, bg: "#FDE3DA", chip: "#C23B1C" },
@@ -94,20 +96,41 @@ const LEADERS = [
   { name: "Vaibhav Dedhia", role: "Head of Growth", tone: "#6B3FA0" },
 ];
 
-function Avatar({ name, tone }) {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
-  return (
-    <div
-      className="w-20 h-20 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0 ring-4 ring-white shadow-sm"
-      style={{ backgroundColor: tone }}
-    >
-      {initials}
-    </div>
-  );
-}
+const EVENTS_LIST = [
+  {
+    id: "evt-1",
+    title: "Yummzo Nano Banana Tasting & Crunch Pop-Up",
+    date: "October 18-20, 2026",
+    time: "11:00 AM - 9:00 PM",
+    location: "Emporium Mall Courtyard, Lahore",
+    category: "Pop-Up & Tasting",
+    description:
+      "Be the first to try our new Signature Nano Banana Crisps! Live vacuum-frying demonstrations, complimentary snack samplers, and limited edition gift hampers.",
+    featured: true,
+  },
+  {
+    id: "evt-2",
+    title: "Asian FMCG & D2C Food Expo 2026",
+    date: "November 12-14, 2026",
+    time: "10:00 AM - 6:00 PM",
+    location: "Expo Center, Hall 3, Karachi",
+    category: "Trade Expo",
+    description:
+      "Connecting with distributors, supermarket buyers, and cafe owners. Meet our founders Jayesh & Jash Chheda to discuss wholesale bulk pricing.",
+    featured: false,
+  },
+  {
+    id: "evt-3",
+    title: "Organic Snacking & Wellness Street Fest",
+    date: "December 05, 2026",
+    time: "4:00 PM - 11:00 PM",
+    location: "Liberty Market Promenade, Lahore",
+    category: "Festival",
+    description:
+      "A celebration of clean label, gluten-free snacks! Enjoy live music, organic tea pairings, and exclusive discounts on Jowar Puffs & Energy Bites.",
+    featured: false,
+  },
+];
 
 function Squiggle({ color = "#241C14", className = "" }) {
   return (
@@ -165,7 +188,7 @@ function PackageArt({ Icon, chip, dark }) {
 }
 
 export default function YummzoApp() {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState("home"); // 'home' | 'products' | 'events' | 'about' | 'contact'
   const [navOpen, setNavOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
 
@@ -187,7 +210,7 @@ export default function YummzoApp() {
   // Contact Modal state
   const [contactOpen, setContactOpen] = useState(false);
 
-  // Check API health and load categories on mount
+  // Load API Health & Categories
   useEffect(() => {
     fetchHealth()
       .then((data) => setApiHealth(data.data))
@@ -198,7 +221,7 @@ export default function YummzoApp() {
       .catch((err) => console.error("Categories fetch failed:", err));
   }, []);
 
-  // Fetch products when selectedCategory changes
+  // Fetch products
   useEffect(() => {
     setLoadingProducts(true);
     const filter = selectedCategory !== "all" ? { category: selectedCategory } : {};
@@ -254,27 +277,6 @@ export default function YummzoApp() {
     }
   };
 
-  const navLink = (label, key, action) => (
-    <button
-      key={label}
-      onClick={() => {
-        if (action) {
-          action();
-        } else {
-          setPage(key);
-        }
-        setNavOpen(false);
-      }}
-      className={`text-left w-full py-3 text-base transition-colors ${
-        page === key
-          ? "text-[#C23B1C] font-semibold"
-          : "text-[#241C14] hover:text-[#C23B1C]"
-      }`}
-    >
-      {label}
-    </button>
-  );
-
   return (
     <div
       className="min-h-screen w-full relative"
@@ -303,7 +305,7 @@ export default function YummzoApp() {
             </span>
           </div>
           <span className="hidden sm:inline opacity-80">
-            Express Backend active at /api
+            Featured Product: <strong>Nano Banana Crisps</strong>
           </span>
         </div>
       </div>
@@ -335,17 +337,18 @@ export default function YummzoApp() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {[
-              ["Home", "home", () => { setPage("home"); setSelectedCategory("all"); }],
-              ["About Us", "about", () => setPage("about")],
-              ["Products", "home", () => { setPage("home"); window.scrollTo({ top: 600, behavior: 'smooth' }); }],
-              ["Contact", "home", () => setContactOpen(true)],
-            ].map(([label, key, action]) => (
+              ["Home", "home"],
+              ["Products", "products"],
+              ["Events", "events"],
+              ["About Us", "about"],
+              ["Contact", "contact"],
+            ].map(([label, key]) => (
               <button
                 key={label}
-                onClick={action}
+                onClick={() => setPage(key)}
                 className={`text-sm tracking-wide transition-colors ${
-                  page === key && label !== "Contact"
-                    ? "text-[#FFC23C] font-semibold"
+                  page === key
+                    ? "text-[#FFC23C] font-semibold border-b-2 border-[#FFC23C] pb-0.5"
                     : "text-[#FFF8E9]/80 hover:text-[#FFC23C]"
                 }`}
               >
@@ -365,7 +368,7 @@ export default function YummzoApp() {
             </button>
             <button
               onClick={() => setContactOpen(true)}
-              className="hidden sm:flex bg-[#FF5A3C] hover:bg-[#E1341E] text-white text-xs font-bold px-3 py-1.5 rounded-full transition-colors"
+              className="hidden sm:flex bg-[#FF5A3C] hover:bg-[#E1341E] text-white text-xs font-bold px-3.5 py-1.5 rounded-full transition-colors"
             >
               Get in Touch
             </button>
@@ -399,10 +402,26 @@ export default function YummzoApp() {
             </button>
           </div>
           <nav className="flex flex-col divide-y divide-[#241C14]/10">
-            {navLink("Home", "home", () => { setPage("home"); setSelectedCategory("all"); })}
-            {navLink("About Us", "about", () => setPage("about"))}
-            {navLink("Products", "home", () => { setPage("home"); window.scrollTo({ top: 600, behavior: 'smooth' }); })}
-            {navLink("Contact Us", "home", () => setContactOpen(true))}
+            {[
+              ["Home", "home"],
+              ["Products Catalog", "products"],
+              ["Events & Expos", "events"],
+              ["About Us", "about"],
+              ["Contact Us", "contact"],
+            ].map(([label, key]) => (
+              <button
+                key={label}
+                onClick={() => {
+                  setPage(key);
+                  setNavOpen(false);
+                }}
+                className={`text-left w-full py-3 text.base transition-colors ${
+                  page === key ? "text-[#C23B1C] font-bold" : "text-[#241C14] hover:text-[#C23B1C]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </nav>
         </div>
       </div>
@@ -423,7 +442,7 @@ export default function YummzoApp() {
               <input
                 type="text"
                 autoFocus
-                placeholder="Search products by name, spice, or tag (e.g. makhana, coffee, spicy)..."
+                placeholder="Search products by name, banana, makhana, spice..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-white border border-[#241C14]/20 rounded-2xl outline-none focus:border-[#FF5A3C] text-sm"
@@ -433,7 +452,6 @@ export default function YummzoApp() {
               )}
             </div>
 
-            {/* Results list */}
             <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
               {searchQuery && searchResults.length === 0 && !searching && (
                 <div className="text-center py-8 text-sm text-[#241C14]/60">
@@ -472,9 +490,7 @@ export default function YummzoApp() {
       )}
 
       {/* ---------------- CONTACT MODAL ---------------- */}
-      {contactOpen && (
-        <ContactModal onClose={() => setContactOpen(false)} />
-      )}
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
 
       {/* ---------------- PRODUCT DETAIL MODAL ---------------- */}
       {selectedProduct && (
@@ -485,8 +501,8 @@ export default function YummzoApp() {
         />
       )}
 
-      {/* ---------------- PAGE CONTENT ---------------- */}
-      {page === "home" ? (
+      {/* ---------------- DYNAMIC PAGES ---------------- */}
+      {page === "home" && (
         <HomePage
           categories={categories}
           products={products}
@@ -495,10 +511,26 @@ export default function YummzoApp() {
           setSelectedCategory={setSelectedCategory}
           onProductClick={handleProductClick}
           onOpenContact={() => setContactOpen(true)}
+          onNavigateProducts={() => setPage("products")}
         />
-      ) : (
-        <AboutPage onOpenContact={() => setContactOpen(true)} />
       )}
+
+      {page === "products" && (
+        <ProductsPage
+          categories={categories}
+          products={products}
+          loadingProducts={loadingProducts}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          onProductClick={handleProductClick}
+        />
+      )}
+
+      {page === "events" && <EventsPage onOpenContact={() => setContactOpen(true)} />}
+
+      {page === "about" && <AboutPage onOpenContact={() => setContactOpen(true)} />}
+
+      {page === "contact" && <ContactPage />}
 
       {/* ---------------- FOOTER ---------------- */}
       <Footer setPage={setPage} onOpenContact={() => setContactOpen(true)} />
@@ -526,71 +558,92 @@ function HomePage({
   setSelectedCategory,
   onProductClick,
   onOpenContact,
+  onNavigateProducts,
 }) {
+  const nanoBananaProduct = products.find((p) => p.slug === "nano-banana-crisps");
+
   return (
     <main>
       {/* ---- HERO / PROMO BENTO ---- */}
       <section className="px-4 sm:px-6 pt-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Main Hero card */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Main Hero Card featuring Nano Banana Package Photo */}
           <div
-            className="relative overflow-hidden rounded-3xl md:col-span-2 p-7 sm:p-10 min-h-[280px] flex flex-col justify-between"
-            style={{ background: "linear-gradient(135deg,#FF5A3C 0%, #E1341E 100%)" }}
+            className="relative overflow-hidden rounded-3xl md:col-span-2 p-6 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl"
+            style={{ background: "linear-gradient(135deg, #FFC23C 0%, #FF9900 100%)" }}
           >
-            <Blob className="w-64 -right-10 -top-16 opacity-20" fill="#FFC23C" />
-            <div className="relative z-10">
-              <span className="inline-block bg-[#FFC23C] text-[#241C14] text-xs font-bold px-3 py-1 rounded-full rotate-[-3deg] mb-4">
-                Order directly from kitchen
+            <Blob className="w-80 -right-16 -top-20 opacity-20" fill="#241C14" />
+            <div className="relative z-10 max-w-md">
+              <span className="inline-block bg-[#241C14] text-[#FFC23C] text-xs font-bold px-3 py-1 rounded-full rotate-[-2deg] mb-3">
+                🔥 NEW RELEASE: Nano Banana Series
               </span>
-              <h1 className="font-display text-3xl sm:text-5xl font-bold text-white leading-[1.05] max-w-md">
-                Peri Peri Makhana & Roasted Snacks
+              <h1 className="font-display text-3xl sm:text-5xl font-bold text-[#241C14] leading-[1.05]">
+                Yummzo Nano Banana Crisps
               </h1>
-              <p className="text-white/85 mt-3 max-w-sm text-sm sm:text-base">
-                Freshly crafted gluten-free, high-protein bites delivered across four continents.
+              <p className="text-[#241C14]/85 mt-3 text-sm sm:text-base leading-relaxed">
+                Vacuum-fried ultra-thin ripe banana slices coated in real honey & sea salt glaze. Unreasonably crunchy!
               </p>
-            </div>
-            <div className="relative z-10 mt-6 flex flex-wrap items-center gap-4 text-white">
-              <PackageArt Icon={Flame} chip="#FFC23C" />
-              <div>
-                <span className="font-display font-semibold text-lg block">
-                  Connected to Yummzo Express REST API
-                </span>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() =>
+                    nanoBananaProduct
+                      ? onProductClick(nanoBananaProduct)
+                      : onNavigateProducts()
+                  }
+                  className="bg-[#241C14] hover:bg-[#3A2A22] text-white font-bold text-sm px-5 py-3 rounded-2xl transition-all shadow-md flex items-center gap-2"
+                >
+                  <ShoppingBag size={18} /> View Nano Banana (299 PKR)
+                </button>
                 <button
                   onClick={onOpenContact}
-                  className="mt-1 inline-flex items-center gap-1.5 text-xs font-bold bg-white text-[#C23B1C] px-3 py-1.5 rounded-full hover:bg-[#FFC23C] transition-colors"
+                  className="bg-white/80 hover:bg-white text-[#241C14] font-bold text-xs px-4 py-3 rounded-2xl transition-all"
                 >
-                  Request Wholesale Pricing <ChevronRight size={14} />
+                  Bulk Inquiry
                 </button>
               </div>
+            </div>
+
+            {/* Generated Nano Banana Package Image */}
+            <div className="relative z-10 shrink-0 group">
+              <div className="w-48 h-56 sm:w-56 sm:h-64 rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform rotate-3 group-hover:rotate-0 transition-all duration-300">
+                <img
+                  src="/images/products/nano-banana-crisps.png"
+                  alt="Yummzo Nano Banana Crisps Packaging"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="absolute -bottom-3 -right-2 bg-[#FF5A3C] text-white font-display text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                100% Ripe Banana
+              </span>
             </div>
           </div>
 
           {/* Secondary promo stack */}
           <div className="flex flex-col gap-4">
             <div
-              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 cursor-pointer"
-              style={{ backgroundColor: "#FFC23C" }}
-              onClick={() => setSelectedCategory("energy-bites")}
+              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 cursor-pointer transition-transform hover:-translate-y-1"
+              style={{ backgroundColor: "#0D6E6E" }}
+              onClick={() => setSelectedCategory("jowar-puffs")}
             >
-              <PackageArt Icon={Leaf} chip="#6B8E3A" />
-              <div>
+              <PackageArt Icon={Wheat} chip="#7FD9C4" dark={true} />
+              <div className="text-white">
                 <h3 className="font-display font-semibold text-lg leading-tight">
-                  Healthy Energy Bites
+                  Jalapeño Jowar Puffs
                 </h3>
-                <p className="text-sm text-[#241C14]/70 mt-1">Walnut-date, no added sugar</p>
+                <p className="text-xs text-white/75 mt-1">Airy sorghum, gluten free</p>
               </div>
             </div>
             <div
-              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 text-white cursor-pointer"
-              style={{ background: "linear-gradient(135deg,#6B3FA0,#4A2A73)" }}
-              onClick={() => setSelectedCategory("gummies")}
+              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 text-white cursor-pointer transition-transform hover:-translate-y-1"
+              style={{ background: "linear-gradient(135deg,#FF5A3C,#C23B1C)" }}
+              onClick={() => setSelectedCategory("flavoured-nuts")}
             >
-              <PackageArt Icon={Coffee} chip="#E6E1F5" />
+              <PackageArt Icon={Flame} chip="#FFC23C" />
               <div>
                 <h3 className="font-display font-semibold text-lg leading-tight">
-                  Instant Tea & Hemp Bites
+                  Peri Peri Makhana
                 </h3>
-                <p className="text-sm text-white/75 mt-1">Saffron & cardamom sachets</p>
+                <p className="text-xs text-white/80 mt-1">High protein roasted snack</p>
               </div>
             </div>
           </div>
@@ -603,62 +656,57 @@ function HomePage({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
             <div>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                Explore Categories (Live API)
+                Snack Categories
               </h2>
               <Squiggle color="#FFC23C" className="mt-2" />
             </div>
 
-            {/* All category pill */}
             <button
-              onClick={() => setSelectedCategory("all")}
-              className={`text-xs font-bold px-4 py-2 rounded-full transition-colors ${
-                selectedCategory === "all"
-                  ? "bg-[#FFC23C] text-[#241C14]"
-                  : "bg-white/10 text-white hover:bg-white/20"
-              }`}
+              onClick={onNavigateProducts}
+              className="text-xs font-bold bg-[#FFC23C] text-[#241C14] px-4 py-2 rounded-full hover:bg-white transition-colors self-start sm:self-auto"
             >
-              Show All Products ({categories.length} categories)
+              View Full Catalog ({categories.length} Categories) →
             </button>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {categories.map((cat) => {
               const style = CATEGORY_STYLES[cat.slug] || DEFAULT_CAT_STYLE;
               const IconComp = style.icon;
-              const isSelected = selectedCategory === cat.slug;
 
               return (
                 <div
                   key={cat.id || cat.slug}
-                  onClick={() => setSelectedCategory(cat.slug)}
-                  className={`cat-card group relative overflow-hidden rounded-2xl p-4 sm:p-5 flex flex-col justify-between min-h-[168px] cursor-pointer transition-all ${
-                    isSelected ? "ring-4 ring-[#FFC23C] scale-[1.02]" : "hover:-translate-y-1"
-                  }`}
+                  onClick={() => {
+                    setSelectedCategory(cat.slug);
+                    onNavigateProducts();
+                  }}
+                  className="cat-card group relative overflow-hidden rounded-2xl p-4 flex flex-col justify-between min-h-[150px] cursor-pointer transition-all hover:-translate-y-1"
                   style={{ backgroundColor: style.bg }}
                 >
                   <div>
                     <h3
-                      className={`font-display font-semibold text-base sm:text-lg leading-tight ${
+                      className={`font-display font-semibold text-base leading-tight ${
                         style.dark ? "text-white" : "text-[#241C14]"
                       }`}
                     >
                       {cat.name}
                     </h3>
                     <span
-                      className="text-xs font-medium mt-1 inline-block"
+                      className="text-[11px] font-medium mt-1 inline-block"
                       style={{ color: style.dark ? "#ffffffaa" : style.chip }}
                     >
                       {cat.tagline || "Snack item"}
                     </span>
                   </div>
-                  <div className="flex items-end justify-between mt-4">
+                  <div className="flex items-end justify-between mt-3">
                     <span
-                      className={`inline-flex items-center gap-1 text-xs sm:text-sm font-semibold ${
+                      className={`inline-flex items-center gap-1 text-xs font-semibold ${
                         style.dark ? "text-[#FFC23C]" : ""
                       }`}
                       style={!style.dark ? { color: style.chip } : undefined}
                     >
-                      View Items <ChevronRight size={14} />
+                      Explore <ChevronRight size={12} />
                     </span>
                     <div className="cat-art">
                       <PackageArt Icon={IconComp} chip={style.chip} dark={style.dark} />
@@ -671,83 +719,30 @@ function HomePage({
         </div>
       </section>
 
-      {/* ---- PRODUCTS CATALOG GRID ---- */}
+      {/* ---- FEATURED PRODUCTS SHOWCASE ---- */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold">
-              {selectedCategory === "all"
-                ? "All Products Catalog"
-                : `Category: ${categories.find((c) => c.slug === selectedCategory)?.name || selectedCategory}`}
-            </h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold">Featured Snacks</h2>
             <Squiggle color="#FF5A3C" className="mt-2" />
           </div>
-          <span className="text-sm font-semibold text-gray-500">
-            {products.length} Products
-          </span>
+          <button
+            onClick={onNavigateProducts}
+            className="text-xs font-bold text-[#FF5A3C] hover:underline"
+          >
+            See All Snacks →
+          </button>
         </div>
 
         {loadingProducts ? (
           <div className="flex flex-col items-center justify-center py-16">
             <Loader2 className="animate-spin text-[#FF5A3C] mb-3" size={36} />
-            <p className="text-sm font-semibold text-gray-500">Fetching products from /api/products...</p>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="bg-white rounded-3xl p-10 text-center border border-[#241C14]/10">
-            <p className="text-gray-500 text-base mb-4">No products found in this category.</p>
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className="bg-[#FF5A3C] text-white text-xs font-bold px-4 py-2 rounded-full"
-            >
-              Reset Category Filter
-            </button>
+            <p className="text-sm font-semibold text-gray-500">Loading products catalog...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((prod) => (
-              <div
-                key={prod.id}
-                onClick={() => onProductClick(prod)}
-                className="bg-white rounded-3xl p-6 border border-[#241C14]/10 hover:border-[#FF5A3C] shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <span className="text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-[#FFEFC2] text-[#B85C00]">
-                      {prod.categorySlug}
-                    </span>
-                    {prod.featured && (
-                      <span className="text-[10px] font-extrabold bg-[#FF5A3C] text-white px-2 py-0.5 rounded-full">
-                        FEATURED
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-display text-xl font-bold text-[#241C14] group-hover:text-[#FF5A3C] transition-colors mb-2">
-                    {prod.name}
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-4">
-                    {prod.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {prod.tags?.map((tag) => (
-                      <span key={tag} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div>
-                    <span className="font-display text-lg font-bold text-[#C23B1C]">
-                      {prod.price} {prod.currency}
-                    </span>
-                    <span className="text-xs text-gray-400 block">{prod.weight}</span>
-                  </div>
-                  <button className="bg-[#241C14] group-hover:bg-[#FF5A3C] text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
+            {products.slice(0, 6).map((prod) => (
+              <ProductCard key={prod.id} prod={prod} onProductClick={onProductClick} />
             ))}
           </div>
         )}
@@ -756,11 +751,140 @@ function HomePage({
   );
 }
 
+/* ================= PRODUCTS PAGE ================= */
+function ProductsPage({
+  categories,
+  products,
+  loadingProducts,
+  selectedCategory,
+  setSelectedCategory,
+  onProductClick,
+}) {
+  return (
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <div className="mb-8">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold">All Products Catalog</h1>
+        <p className="text-sm text-gray-600 mt-2">
+          Discover our full range of handcrafted, plant-first snacks.
+        </p>
+        <Squiggle color="#0D6E6E" className="mt-3" />
+      </div>
+
+      {/* Category Pills Filter */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        <button
+          onClick={() => setSelectedCategory("all")}
+          className={`text-xs font-bold px-4 py-2 rounded-full transition-all ${
+            selectedCategory === "all"
+              ? "bg-[#241C14] text-[#FFC23C]"
+              : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+          }`}
+        >
+          All Items ({products.length})
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.id || cat.slug}
+            onClick={() => setSelectedCategory(cat.slug)}
+            className={`text-xs font-bold px-4 py-2 rounded-full transition-all ${
+              selectedCategory === cat.slug
+                ? "bg-[#FF5A3C] text-white shadow-sm"
+                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {loadingProducts ? (
+        <div className="flex flex-col items-center justify-center py-16">
+          <Loader2 className="animate-spin text-[#FF5A3C] mb-3" size={36} />
+          <p className="text-sm font-semibold text-gray-500">Fetching products...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((prod) => (
+            <ProductCard key={prod.id} prod={prod} onProductClick={onProductClick} />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+/* ================= EVENTS PAGE ================= */
+function EventsPage({ onOpenContact }) {
+  return (
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <div className="mb-10 text-center max-w-2xl mx-auto">
+        <span className="bg-[#FFC23C] text-[#241C14] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
+          Expos & Pop-Ups
+        </span>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3">
+          Upcoming Events & Tasting Labs
+        </h1>
+        <p className="text-sm text-gray-600 mt-2">
+          Come meet the Yummzo team live, taste fresh batches, and get exclusive event-only discounts.
+        </p>
+        <Squiggle color="#C23B1C" className="mt-3 mx-auto" />
+      </div>
+
+      <div className="space-y-6">
+        {EVENTS_LIST.map((evt) => (
+          <div
+            key={evt.id}
+            className={`bg-white rounded-3xl p-6 sm:p-8 border shadow-sm flex flex-col md:flex-row justify-between gap-6 transition-all hover:shadow-md ${
+              evt.featured ? "border-[#FF5A3C] ring-2 ring-[#FF5A3C]/20" : "border-[#241C14]/10"
+            }`}
+          >
+            <div className="space-y-3 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold uppercase bg-[#FFEFC2] text-[#B85C00] px-3 py-1 rounded-full">
+                  {evt.category}
+                </span>
+                {evt.featured && (
+                  <span className="text-xs font-bold bg-[#FF5A3C] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    <Star size={12} fill="white" /> FEATURED EVENT
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-display text-2xl font-bold text-[#241C14]">{evt.title}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">{evt.description}</p>
+
+              <div className="flex flex-wrap gap-4 text-xs font-medium text-gray-700 pt-2">
+                <span className="flex items-center gap-1.5">
+                  <Calendar size={16} className="text-[#FF5A3C]" /> {evt.date}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Clock size={16} className="text-[#0D6E6E]" /> {evt.time}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <MapPin size={16} className="text-[#6B3FA0]" /> {evt.location}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex md:flex-col justify-center items-end shrink-0 gap-3 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+              <button
+                onClick={onOpenContact}
+                className="w-full sm:w-auto bg-[#241C14] hover:bg-[#FF5A3C] text-white text-xs font-bold px-5 py-3 rounded-2xl transition-colors flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Ticket size={16} /> RSVP / Get VIP Pass
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </main>
+  );
+}
+
 /* ================= ABOUT PAGE ================= */
 function AboutPage({ onOpenContact }) {
   return (
     <main>
-      {/* ---- INTRO SPLIT ---- */}
       <section className="px-4 sm:px-6 pt-10">
         <div
           className="max-w-6xl mx-auto rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-2"
@@ -773,12 +897,11 @@ function AboutPage({ onOpenContact }) {
             <Squiggle color="#C23B1C" className="mt-3 mb-4" />
             <p className="text-[#241C14]/90 text-base leading-relaxed">
               At Yummzo Foods, we're passionate about creating delicious and
-              innovative snack experiences.
+              innovative snack experiences like our Signature Nano Banana Crisps.
             </p>
             <p className="text-[#241C14]/70 text-sm mt-3 leading-relaxed">
-              We handcraft premium, on-the-go treats using high-quality
-              ingredients, bold flavors, and unique combinations. Join us on
-              our journey to redefine snacking.
+              We handcraft premium, on-the-go treats using high-quality ingredients,
+              bold flavors, and unique vacuum-frying techniques.
             </p>
             <div className="mt-6">
               <button
@@ -789,28 +912,16 @@ function AboutPage({ onOpenContact }) {
               </button>
             </div>
           </div>
-          <div className="relative min-h-[220px] md:min-h-0">
-            <div
-              className="absolute inset-4 sm:inset-6 rounded-3xl flex items-center justify-center"
-              style={{ background: "linear-gradient(160deg,#FF5A3C,#C23B1C)" }}
-            >
-              <div className="grid grid-cols-2 gap-3 p-6">
-                {[Flame, Leaf, Candy, Coffee].map((Icon, i) => (
-                  <div
-                    key={i}
-                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center rotate-[-4deg]"
-                    style={{ transform: `rotate(${i % 2 ? 4 : -4}deg)` }}
-                  >
-                    <Icon size={28} color="#FFF8E9" strokeWidth={1.6} />
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="relative min-h-[220px] md:min-h-0 flex items-center justify-center p-6 bg-[#FF5A3C]">
+            <img
+              src="/images/products/nano-banana-crisps.png"
+              alt="Yummzo Product Banner"
+              className="max-h-64 rounded-2xl shadow-2xl rotate-2"
+            />
           </div>
         </div>
       </section>
 
-      {/* ---- MISSION ---- */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <h2 className="font-display text-2xl sm:text-3xl font-bold">Our mission</h2>
         <Squiggle color="#0D6E6E" className="mt-2 mb-8" />
@@ -829,67 +940,99 @@ function AboutPage({ onOpenContact }) {
           ))}
         </div>
       </section>
+    </main>
+  );
+}
 
-      {/* ---- DIFFERENTIATORS ---- */}
-      <section className="mt-16 py-14" style={{ backgroundColor: "#241C14" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
-            What makes us different
-          </h2>
-          <Squiggle color="#FFC23C" className="mt-2 mb-9" />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {DIFFERENTIATORS.map((d) => (
-              <div
-                key={d.title}
-                className="rounded-2xl p-6"
-                style={{ backgroundColor: "#2E241A" }}
-              >
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-                  style={{ border: "2px solid #FFC23C" }}
-                >
-                  <d.icon size={24} color="#FFC23C" strokeWidth={1.75} />
-                </div>
-                <h3 className="font-display font-semibold text-white text-lg mb-2">
-                  {d.title}
-                </h3>
-                <p className="text-sm text-white/60 leading-relaxed">{d.copy}</p>
-              </div>
-            ))}
-          </div>
+/* ================= CONTACT PAGE ================= */
+function ContactPage() {
+  return (
+    <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+      <div className="text-center mb-8">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold">Contact & Wholesale Enquiries</h1>
+        <p className="text-sm text-gray-600 mt-2">
+          Whether you want to carry Yummzo snacks in your store or ask a question, we'd love to talk!
+        </p>
+        <Squiggle color="#FF5A3C" className="mt-3 mx-auto" />
+      </div>
+
+      <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#241C14]/10 shadow-lg">
+        <ContactFormContent />
+      </div>
+    </main>
+  );
+}
+
+/* ================= REUSABLE PRODUCT CARD ================= */
+function ProductCard({ prod, onProductClick }) {
+  const isNanoBanana = prod.slug === "nano-banana-crisps";
+
+  return (
+    <div
+      onClick={() => onProductClick(prod)}
+      className="bg-white rounded-3xl p-6 border border-[#241C14]/10 hover:border-[#FF5A3C] shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+    >
+      {isNanoBanana && (
+        <div className="h-40 -mx-6 -mt-6 mb-4 overflow-hidden bg-[#FFF4CE] flex items-center justify-center">
+          <img
+            src="/images/products/nano-banana-crisps.png"
+            alt={prod.name}
+            className="h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
         </div>
-      </section>
+      )}
 
-      {/* ---- LEADERSHIP ---- */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="font-display text-2xl sm:text-3xl font-bold text-center">
-          Meet our leaders
-        </h2>
-        <Squiggle color="#C23B1C" className="mt-2 mb-10 mx-auto" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {LEADERS.map((l) => (
-            <div key={l.name} className="flex flex-col items-center text-center gap-3">
-              <Avatar name={l.name} tone={l.tone} />
-              <div>
-                <p className="font-semibold text-sm">{l.name}</p>
-                <p className="text-xs text-[#241C14]/60">{l.role}</p>
-              </div>
-            </div>
+      <div>
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <span className="text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-[#FFEFC2] text-[#B85C00]">
+            {prod.categorySlug}
+          </span>
+          {prod.featured && (
+            <span className="text-[10px] font-extrabold bg-[#FF5A3C] text-white px-2 py-0.5 rounded-full">
+              FEATURED
+            </span>
+          )}
+        </div>
+        <h3 className="font-display text-xl font-bold text-[#241C14] group-hover:text-[#FF5A3C] transition-colors mb-2">
+          {prod.name}
+        </h3>
+        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-4">
+          {prod.description}
+        </p>
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {prod.tags?.map((tag) => (
+            <span key={tag} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+              #{tag}
+            </span>
           ))}
         </div>
-      </section>
-    </main>
+      </div>
+
+      <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+        <div>
+          <span className="font-display text-lg font-bold text-[#C23B1C]">
+            {prod.price} {prod.currency}
+          </span>
+          <span className="text-xs text-gray-400 block">{prod.weight}</span>
+        </div>
+        <button className="bg-[#241C14] group-hover:bg-[#FF5A3C] text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors">
+          View Details
+        </button>
+      </div>
+    </div>
   );
 }
 
 /* ================= PRODUCT DETAIL MODAL ================= */
 function ProductDetailModal({ product, loading, onClose }) {
+  const isNanoBanana = product.slug === "nano-banana-crisps";
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-[#FFF8E9] w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5"
+          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5 z-10"
         >
           <X size={20} />
         </button>
@@ -897,21 +1040,27 @@ function ProductDetailModal({ product, loading, onClose }) {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="animate-spin text-[#FF5A3C] mb-3" size={32} />
-            <p className="text-xs text-gray-500">Loading product data...</p>
+            <p className="text-xs text-gray-500">Loading product details...</p>
           </div>
         ) : (
           <div>
+            {isNanoBanana && (
+              <div className="mb-4 rounded-2xl overflow-hidden h-48 bg-[#FFF4CE] flex items-center justify-center">
+                <img
+                  src="/images/products/nano-banana-crisps.png"
+                  alt={product.name}
+                  className="h-full object-cover"
+                />
+              </div>
+            )}
+
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold uppercase tracking-wider bg-[#FFC23C] px-3 py-1 rounded-full text-[#241C14]">
                 {product.categorySlug}
               </span>
-              {product.inStock ? (
+              {product.inStock && (
                 <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                   <CheckCircle2 size={12} /> In Stock
-                </span>
-              ) : (
-                <span className="text-xs font-semibold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
-                  Out of Stock
                 </span>
               )}
             </div>
@@ -924,20 +1073,17 @@ function ProductDetailModal({ product, loading, onClose }) {
               <span className="font-display text-2xl font-bold text-[#C23B1C]">
                 {product.price} {product.currency}
               </span>
-              <span className="text-sm font-medium text-gray-500">
-                Weight / Size: {product.weight}
-              </span>
+              <span className="text-sm font-medium text-gray-500">Weight: {product.weight}</span>
             </div>
 
             <p className="text-sm text-[#241C14]/80 leading-relaxed mb-6 bg-white p-4 rounded-2xl border border-[#241C14]/10">
               {product.description}
             </p>
 
-            {/* Nutrition Information */}
             {product.nutrition && (
               <div className="mb-6">
                 <h4 className="font-display font-semibold text-sm mb-3 flex items-center gap-1.5">
-                  <Info size={16} className="text-[#0D6E6E]" /> Nutritional Information ({product.nutrition.servingSize})
+                  <Info size={16} className="text-[#0D6E6E]" /> Nutritional Values ({product.nutrition.servingSize})
                 </h4>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center text-xs">
                   {Object.entries(product.nutrition)
@@ -949,20 +1095,6 @@ function ProductDetailModal({ product, loading, onClose }) {
                       </div>
                     ))}
                 </div>
-              </div>
-            )}
-
-            {/* Tags */}
-            {product.tags && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {product.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs bg-[#0D6E6E]/10 text-[#0D6E6E] px-3 py-1 rounded-lg font-semibold"
-                  >
-                    #{tag}
-                  </span>
-                ))}
               </div>
             )}
 
@@ -979,16 +1111,27 @@ function ProductDetailModal({ product, loading, onClose }) {
   );
 }
 
-/* ================= CONTACT FORM MODAL ================= */
+/* ================= REUSABLE CONTACT FORM ================= */
 function ContactModal({ onClose }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-[#FFF8E9] w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5"
+        >
+          <X size={20} />
+        </button>
+        <ContactFormContent />
+      </div>
+    </div>
+  );
+}
+
+function ContactFormContent() {
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState(null); // { type: 'success'|'error', text: '' }
+  const [status, setStatus] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -999,13 +1142,13 @@ function ContactModal({ onClose }) {
       const res = await submitContact(formData);
       setStatus({
         type: "success",
-        text: `Thank you! Your message was submitted successfully (Lead ID: ${res.data?.lead?.id || "Saved"}).`,
+        text: `Submitted! Your inquiry was sent successfully (Lead ID: ${res.data?.lead?.id || "Saved"}).`,
       });
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
       setStatus({
         type: "error",
-        text: err.message || "Failed to submit enquiry. Please check form input.",
+        text: err.message || "Submission failed. Please check form input.",
       });
     } finally {
       setSubmitting(false);
@@ -1013,101 +1156,82 @@ function ContactModal({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#FFF8E9] w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5"
+    <div>
+      <h2 className="font-display text-2xl font-bold mb-1">Get in Touch</h2>
+      <p className="text-xs text-gray-600 mb-6">
+        Connected to backend endpoint <code className="bg-[#241C14]/10 px-1 py-0.5 rounded">POST /api/contact</code>
+      </p>
+
+      {status && (
+        <div
+          className={`p-4 rounded-2xl mb-4 text-xs font-semibold flex items-center gap-2 ${
+            status.type === "success"
+              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+              : "bg-rose-100 text-rose-800 border border-rose-300"
+          }`}
         >
-          <X size={20} />
+          {status.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          <span>{status.text}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold mb-1 text-gray-700">Full Name *</label>
+          <input
+            type="text"
+            required
+            placeholder="Faizan Ali"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold mb-1 text-gray-700">Email Address *</label>
+          <input
+            type="email"
+            required
+            placeholder="faizan@example.com"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold mb-1 text-gray-700">Subject *</label>
+          <input
+            type="text"
+            required
+            placeholder="Nano Banana bulk order / inquiry"
+            value={formData.subject}
+            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold mb-1 text-gray-700">Message *</label>
+          <textarea
+            required
+            rows={3}
+            placeholder="Tell us about your question or order..."
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm resize-none"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full bg-[#C23B1C] hover:bg-[#A02D15] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+        >
+          {submitting ? <Loader2 className="animate-spin" size={16} /> : "Submit Inquiry to API"}
         </button>
-
-        <h2 className="font-display text-2xl font-bold mb-1">Get in Touch</h2>
-        <p className="text-xs text-gray-600 mb-6">
-          Directly posts to Express backend endpoint <code className="bg-[#241C14]/10 px-1 py-0.5 rounded text-[11px]">POST /api/contact</code>
-        </p>
-
-        {status && (
-          <div
-            className={`p-4 rounded-2xl mb-4 text-xs font-semibold flex items-center gap-2 ${
-              status.type === "success"
-                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                : "bg-rose-100 text-rose-800 border border-rose-300"
-            }`}
-          >
-            {status.type === "success" ? (
-              <CheckCircle2 size={18} className="shrink-0" />
-            ) : (
-              <AlertCircle size={18} className="shrink-0" />
-            )}
-            <span>{status.text}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">Full Name *</label>
-            <input
-              type="text"
-              required
-              placeholder="Faizan Ali"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">Email Address *</label>
-            <input
-              type="email"
-              required
-              placeholder="faizan@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">Subject *</label>
-            <input
-              type="text"
-              required
-              placeholder="Bulk order enquiry"
-              value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">Message *</label>
-            <textarea
-              required
-              rows={3}
-              placeholder="Tell us about your order or question..."
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm resize-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-[#C23B1C] hover:bg-[#A02D15] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="animate-spin" size={16} /> Submitting Lead...
-              </>
-            ) : (
-              "Submit Lead to API"
-            )}
-          </button>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }
@@ -1122,8 +1246,7 @@ function Footer({ setPage, onOpenContact }) {
             YUMMZO <span style={{ color: "#FFC23C" }}>◕‿◕</span>
           </span>
           <p className="text-sm text-[#241C14]/70 mt-3 max-w-xs leading-relaxed">
-            At Yummzo Foods, we're passionate about creating delicious and
-            innovative snack experiences.
+            Crafting innovative, delicious snacks like our Signature Nano Banana Crisps.
           </p>
           <div className="flex gap-3 mt-5">
             {[Instagram, Facebook, Twitter].map((Icon, i) => (
@@ -1140,11 +1263,21 @@ function Footer({ setPage, onOpenContact }) {
         </div>
 
         <div>
-          <h4 className="font-display font-semibold mb-3">Navigation</h4>
+          <h4 className="font-display font-semibold mb-3">Pages</h4>
           <ul className="space-y-2 text-sm text-[#241C14]/70">
             <li>
               <button onClick={() => setPage("home")} className="hover:text-[#C23B1C]">
-                Home
+                Home Page
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setPage("products")} className="hover:text-[#C23B1C]">
+                Products Catalog
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setPage("events")} className="hover:text-[#C23B1C]">
+                Events & Expos
               </button>
             </li>
             <li>
@@ -1153,12 +1286,7 @@ function Footer({ setPage, onOpenContact }) {
               </button>
             </li>
             <li>
-              <button onClick={() => setPage("home")} className="hover:text-[#C23B1C]">
-                Products
-              </button>
-            </li>
-            <li>
-              <button onClick={onOpenContact} className="hover:text-[#C23B1C]">
+              <button onClick={() => setPage("contact")} className="hover:text-[#C23B1C]">
                 Contact Us
               </button>
             </li>
@@ -1185,7 +1313,7 @@ function Footer({ setPage, onOpenContact }) {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 pt-6 border-t border-[#241C14]/10 text-xs text-[#241C14]/50 flex flex-col sm:flex-row justify-between items-center gap-2">
         <span>© {new Date().getFullYear()} Yummzo Foods. All rights reserved.</span>
-        <span>Express API Integration active</span>
+        <span>Express API + Nano Banana Series</span>
       </div>
     </footer>
   );

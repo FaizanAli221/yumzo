@@ -6,6 +6,23 @@
 
 const products = [
   {
+    id: "prod_100",
+    slug: "nano-banana-crisps",
+    name: "Yummzo Nano Banana Crisps",
+    categorySlug: "nano-banana",
+    price: 299,
+    currency: "PKR",
+    weight: "180g",
+    featured: true,
+    inStock: true,
+    description:
+      "Signature Nano Banana Crisps — vacuum-fried thin banana slices coated in real honey & sea salt glaze. Unbelievably crunchy and nutrient-dense.",
+    tags: ["nano-banana", "vacuum-fried", "gluten-free", "signature"],
+    nutrition: { servingSize: "30g", calories: 135, protein: "2g", fat: "4g", carbs: "22g", sugar: "6g" },
+    images: ["/images/products/nano-banana-crisps.png"],
+    createdAt: "2024-02-10T00:00:00.000Z",
+  },
+  {
     id: "prod_101",
     slug: "peri-peri-makhana",
     name: "Peri Peri Makhana",
