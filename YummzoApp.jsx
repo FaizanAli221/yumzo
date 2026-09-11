@@ -32,9 +32,11 @@ import {
   Ticket,
   Star,
   ShoppingBag,
+  Phone,
+  MessageSquare,
+  Building,
 } from "lucide-react";
 import {
-  fetchHealth,
   fetchCategories,
   fetchProducts,
   fetchProductById,
@@ -102,7 +104,7 @@ const EVENTS_LIST = [
     title: "Yummzo Nano Banana Tasting & Crunch Pop-Up",
     date: "October 18-20, 2026",
     time: "11:00 AM - 9:00 PM",
-    location: "Emporium Mall Courtyard, Lahore",
+    location: "Emporium Mall Courtyard, Gulberg, Lahore",
     category: "Pop-Up & Tasting",
     description:
       "Be the first to try our new Signature Nano Banana Crisps! Live vacuum-frying demonstrations, complimentary snack samplers, and limited edition gift hampers.",
@@ -171,7 +173,7 @@ function Blob({ className, fill }) {
 
 function PackageArt({ Icon, chip, dark }) {
   return (
-    <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0">
+    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
       <div
         className="absolute inset-0 rounded-[28%] rotate-6 opacity-90"
         style={{ backgroundColor: chip }}
@@ -181,19 +183,18 @@ function PackageArt({ Icon, chip, dark }) {
           dark ? "bg-[#241C14]/80" : "bg-white/85"
         }`}
       >
-        <Icon size={32} color={chip} strokeWidth={1.75} />
+        <Icon size={28} color={chip} strokeWidth={1.75} />
       </div>
     </div>
   );
 }
 
 export default function YummzoApp() {
-  const [page, setPage] = useState("home"); // 'home' | 'products' | 'events' | 'about' | 'contact'
+  const [page, setPage] = useState("home");
   const [navOpen, setNavOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
 
   // API State
-  const [apiHealth, setApiHealth] = useState(null);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -210,12 +211,8 @@ export default function YummzoApp() {
   // Contact Modal state
   const [contactOpen, setContactOpen] = useState(false);
 
-  // Load API Health & Categories
+  // Load Categories on mount
   useEffect(() => {
-    fetchHealth()
-      .then((data) => setApiHealth(data.data))
-      .catch((err) => console.error("Health check failed:", err));
-
     fetchCategories()
       .then((data) => setCategories(data))
       .catch((err) => console.error("Categories fetch failed:", err));
@@ -293,22 +290,6 @@ export default function YummzoApp() {
         .cat-card:hover .cat-art { transform: translateY(-4px) rotate(-2deg) scale(1.05); }
         .cat-art { transition: transform .3s ease; }
       `}</style>
-
-      {/* ---------------- API STATUS BADGE BAR ---------------- */}
-      <div className="bg-[#173B36] text-[#7FD9C4] text-xs px-4 py-1.5 flex items-center justify-between font-medium">
-        <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#7FD9C4] animate-pulse" />
-            <span>
-              REST API Status:{" "}
-              {apiHealth ? `Connected (v${apiHealth.version})` : "Connecting..."}
-            </span>
-          </div>
-          <span className="hidden sm:inline opacity-80">
-            Featured Product: <strong>Nano Banana Crisps</strong>
-          </span>
-        </div>
-      </div>
 
       {/* ---------------- HEADER ---------------- */}
       <header className="sticky top-0 z-40 bg-[#241C14] text-[#FFF8E9] shadow-md">
@@ -415,7 +396,7 @@ export default function YummzoApp() {
                   setPage(key);
                   setNavOpen(false);
                 }}
-                className={`text-left w-full py-3 text.base transition-colors ${
+                className={`text-left w-full py-3 text-base transition-colors ${
                   page === key ? "text-[#C23B1C] font-bold" : "text-[#241C14] hover:text-[#C23B1C]"
                 }`}
               >
@@ -468,9 +449,17 @@ export default function YummzoApp() {
                   className="bg-white p-3 rounded-2xl border border-[#241C14]/10 hover:border-[#FF5A3C] flex items-center justify-between cursor-pointer transition-all hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#FFEFC2] flex items-center justify-center font-display font-bold text-[#FF5A3C]">
-                      {prod.name[0]}
-                    </div>
+                    {prod.images?.[0] ? (
+                      <img
+                        src={prod.images[0]}
+                        alt={prod.name}
+                        className="w-12 h-12 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-[#FFEFC2] flex items-center justify-center font-display font-bold text-[#FF5A3C]">
+                        {prod.name[0]}
+                      </div>
+                    )}
                     <div>
                       <h4 className="font-semibold text-sm">{prod.name}</h4>
                       <p className="text-xs text-gray-500 line-clamp-1">{prod.description}</p>
@@ -618,27 +607,35 @@ function HomePage({
             </div>
           </div>
 
-          {/* Secondary promo stack */}
+          {/* Secondary promo stack with real product shots */}
           <div className="flex flex-col gap-4">
             <div
-              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 cursor-pointer transition-transform hover:-translate-y-1"
-              style={{ backgroundColor: "#0D6E6E" }}
+              className="relative overflow-hidden rounded-3xl p-5 flex items-center gap-4 flex-1 cursor-pointer transition-transform hover:-translate-y-1 bg-[#0D6E6E] text-white"
               onClick={() => setSelectedCategory("jowar-puffs")}
             >
-              <PackageArt Icon={Wheat} chip="#7FD9C4" dark={true} />
-              <div className="text-white">
+              <img
+                src="/images/products/jalapeno-jowar-puffs.png"
+                alt="Jalapeno Jowar Puffs"
+                className="w-20 h-20 rounded-2xl object-cover shadow-md shrink-0 border-2 border-white/20"
+              />
+              <div>
                 <h3 className="font-display font-semibold text-lg leading-tight">
                   Jalapeño Jowar Puffs
                 </h3>
                 <p className="text-xs text-white/75 mt-1">Airy sorghum, gluten free</p>
               </div>
             </div>
+
             <div
-              className="relative overflow-hidden rounded-3xl p-6 flex items-center gap-4 flex-1 text-white cursor-pointer transition-transform hover:-translate-y-1"
+              className="relative overflow-hidden rounded-3xl p-5 flex items-center gap-4 flex-1 text-white cursor-pointer transition-transform hover:-translate-y-1"
               style={{ background: "linear-gradient(135deg,#FF5A3C,#C23B1C)" }}
               onClick={() => setSelectedCategory("flavoured-nuts")}
             >
-              <PackageArt Icon={Flame} chip="#FFC23C" />
+              <img
+                src="/images/products/peri-peri-makhana.png"
+                alt="Peri Peri Makhana"
+                className="w-20 h-20 rounded-2xl object-cover shadow-md shrink-0 border-2 border-white/20"
+              />
               <div>
                 <h3 className="font-display font-semibold text-lg leading-tight">
                   Peri Peri Makhana
@@ -897,11 +894,11 @@ function AboutPage({ onOpenContact }) {
             <Squiggle color="#C23B1C" className="mt-3 mb-4" />
             <p className="text-[#241C14]/90 text-base leading-relaxed">
               At Yummzo Foods, we're passionate about creating delicious and
-              innovative snack experiences like our Signature Nano Banana Crisps.
+              innovative snack experiences like our Signature Nano Banana Crisps and Peri Peri Makhana.
             </p>
             <p className="text-[#241C14]/70 text-sm mt-3 leading-relaxed">
               We handcraft premium, on-the-go treats using high-quality ingredients,
-              bold flavors, and unique vacuum-frying techniques.
+              bold flavors, and unique vacuum-frying & slow-roasting techniques.
             </p>
             <div className="mt-6">
               <button
@@ -916,7 +913,7 @@ function AboutPage({ onOpenContact }) {
             <img
               src="/images/products/nano-banana-crisps.png"
               alt="Yummzo Product Banner"
-              className="max-h-64 rounded-2xl shadow-2xl rotate-2"
+              className="max-h-64 rounded-2xl shadow-2xl rotate-2 object-cover"
             />
           </div>
         </div>
@@ -940,6 +937,29 @@ function AboutPage({ onOpenContact }) {
           ))}
         </div>
       </section>
+
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-center">
+          Meet our leadership
+        </h2>
+        <Squiggle color="#C23B1C" className="mt-2 mb-10 mx-auto" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          {LEADERS.map((l) => (
+            <div key={l.name} className="flex flex-col items-center text-center gap-3">
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0 ring-4 ring-white shadow-sm"
+                style={{ backgroundColor: l.tone }}
+              >
+                {l.name.split(" ").map((n) => n[0]).join("")}
+              </div>
+              <div>
+                <p className="font-semibold text-sm">{l.name}</p>
+                <p className="text-xs text-[#241C14]/60">{l.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
@@ -947,17 +967,73 @@ function AboutPage({ onOpenContact }) {
 /* ================= CONTACT PAGE ================= */
 function ContactPage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-      <div className="text-center mb-8">
-        <h1 className="font-display text-3xl sm:text-4xl font-bold">Contact & Wholesale Enquiries</h1>
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <div className="text-center mb-10 max-w-2xl mx-auto">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold">Contact & Support</h1>
         <p className="text-sm text-gray-600 mt-2">
-          Whether you want to carry Yummzo snacks in your store or ask a question, we'd love to talk!
+          Get in touch with our team for retail distribution, wholesale inquiries, or customer support.
         </p>
         <Squiggle color="#FF5A3C" className="mt-3 mx-auto" />
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#241C14]/10 shadow-lg">
-        <ContactFormContent />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Real Contact Info Cards */}
+        <div className="space-y-4">
+          <div className="bg-white rounded-3xl p-6 border border-[#241C14]/10 shadow-sm flex items-start gap-4">
+            <div className="p-3 bg-[#FFEFC2] text-[#B85C00] rounded-2xl shrink-0">
+              <Mail size={22} />
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm mb-1">Email Us</h4>
+              <a href="mailto:support@yummzofoods.com" className="text-xs text-gray-600 hover:text-[#C23B1C] block">
+                support@yummzofoods.com
+              </a>
+              <a href="mailto:orders@yummzofoods.com" className="text-xs text-gray-600 hover:text-[#C23B1C] block mt-0.5">
+                orders@yummzofoods.com
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-[#241C14]/10 shadow-sm flex items-start gap-4">
+            <div className="p-3 bg-[#EAF3D8] text-[#6B8E3A] rounded-2xl shrink-0">
+              <Phone size={22} />
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm mb-1">Customer Helpline</h4>
+              <p className="text-xs text-gray-700 font-semibold">+92 (42) 3578 9912</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Mon - Sat: 9:00 AM - 7:00 PM</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-[#241C14]/10 shadow-sm flex items-start gap-4">
+            <div className="p-3 bg-[#E6E1F5] text-[#6B3FA0] rounded-2xl shrink-0">
+              <MessageSquare size={22} />
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm mb-1">Wholesale WhatsApp</h4>
+              <a href="https://wa.me/923008479920" target="_blank" rel="noreferrer" className="text-xs text-emerald-700 font-bold hover:underline">
+                +92 (300) 847 9920 (Click to Chat)
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-[#241C14]/10 shadow-sm flex items-start gap-4">
+            <div className="p-3 bg-[#DCEEEC] text-[#0D6E6E] rounded-2xl shrink-0">
+              <Building size={22} />
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm mb-1">Head Office</h4>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Suite 402, Business Avenue, Main Boulevard, Gulberg III, Lahore, Pakistan
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Form */}
+        <div className="md:col-span-2 bg-white rounded-3xl p-6 sm:p-10 border border-[#241C14]/10 shadow-lg">
+          <ContactFormContent />
+        </div>
       </div>
     </main>
   );
@@ -965,34 +1041,39 @@ function ContactPage() {
 
 /* ================= REUSABLE PRODUCT CARD ================= */
 function ProductCard({ prod, onProductClick }) {
-  const isNanoBanana = prod.slug === "nano-banana-crisps";
+  const hasImage = prod.images && prod.images[0];
 
   return (
     <div
       onClick={() => onProductClick(prod)}
       className="bg-white rounded-3xl p-6 border border-[#241C14]/10 hover:border-[#FF5A3C] shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
     >
-      {isNanoBanana && (
-        <div className="h-40 -mx-6 -mt-6 mb-4 overflow-hidden bg-[#FFF4CE] flex items-center justify-center">
-          <img
-            src="/images/products/nano-banana-crisps.png"
-            alt={prod.name}
-            className="h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-      )}
-
       <div>
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <span className="text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-[#FFEFC2] text-[#B85C00]">
-            {prod.categorySlug}
-          </span>
+        <div className="h-44 -mx-6 -mt-6 mb-4 overflow-hidden bg-[#FFEFC2] flex items-center justify-center relative">
+          {hasImage ? (
+            <img
+              src={prod.images[0]}
+              alt={prod.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#FFF4CE] flex items-center justify-center">
+              <Package size={44} className="text-[#FF5A3C] opacity-80" />
+            </div>
+          )}
           {prod.featured && (
-            <span className="text-[10px] font-extrabold bg-[#FF5A3C] text-white px-2 py-0.5 rounded-full">
+            <span className="absolute top-3 right-3 text-[10px] font-extrabold bg-[#FF5A3C] text-white px-2.5 py-1 rounded-full shadow-md">
               FEATURED
             </span>
           )}
         </div>
+
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
+            {prod.categorySlug}
+          </span>
+        </div>
+
         <h3 className="font-display text-xl font-bold text-[#241C14] group-hover:text-[#FF5A3C] transition-colors mb-2">
           {prod.name}
         </h3>
@@ -1025,14 +1106,14 @@ function ProductCard({ prod, onProductClick }) {
 
 /* ================= PRODUCT DETAIL MODAL ================= */
 function ProductDetailModal({ product, loading, onClose }) {
-  const isNanoBanana = product.slug === "nano-banana-crisps";
+  const hasImage = product.images && product.images[0];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-[#FFF8E9] w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5 z-10"
+          className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/5 z-10 bg-white/80 backdrop-blur-sm"
         >
           <X size={20} />
         </button>
@@ -1044,12 +1125,12 @@ function ProductDetailModal({ product, loading, onClose }) {
           </div>
         ) : (
           <div>
-            {isNanoBanana && (
-              <div className="mb-4 rounded-2xl overflow-hidden h-48 bg-[#FFF4CE] flex items-center justify-center">
+            {hasImage && (
+              <div className="mb-4 rounded-2xl overflow-hidden h-52 bg-[#FFF4CE] flex items-center justify-center">
                 <img
-                  src="/images/products/nano-banana-crisps.png"
+                  src={product.images[0]}
                   alt={product.name}
-                  className="h-full object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
@@ -1142,7 +1223,7 @@ function ContactFormContent() {
       const res = await submitContact(formData);
       setStatus({
         type: "success",
-        text: `Submitted! Your inquiry was sent successfully (Lead ID: ${res.data?.lead?.id || "Saved"}).`,
+        text: `Thank you! Your message was submitted successfully (Lead ID: ${res.data?.lead?.id || "Saved"}).`,
       });
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
@@ -1157,9 +1238,9 @@ function ContactFormContent() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold mb-1">Get in Touch</h2>
+      <h2 className="font-display text-2xl font-bold mb-1">Send Us a Message</h2>
       <p className="text-xs text-gray-600 mb-6">
-        Connected to backend endpoint <code className="bg-[#241C14]/10 px-1 py-0.5 rounded">POST /api/contact</code>
+        Fill out the form below for retail distribution, bulk quotes, or general questions.
       </p>
 
       {status && (
@@ -1205,7 +1286,7 @@ function ContactFormContent() {
           <input
             type="text"
             required
-            placeholder="Nano Banana bulk order / inquiry"
+            placeholder="Wholesale enquiry / Bulk Order"
             value={formData.subject}
             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
             className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm"
@@ -1217,7 +1298,7 @@ function ContactFormContent() {
           <textarea
             required
             rows={3}
-            placeholder="Tell us about your question or order..."
+            placeholder="Tell us about your question or order quantity..."
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             className="w-full px-4 py-2.5 bg-white border border-[#241C14]/20 rounded-xl outline-none focus:border-[#FF5A3C] text-sm resize-none"
@@ -1229,7 +1310,7 @@ function ContactFormContent() {
           disabled={submitting}
           className="w-full bg-[#C23B1C] hover:bg-[#A02D15] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
         >
-          {submitting ? <Loader2 className="animate-spin" size={16} /> : "Submit Inquiry to API"}
+          {submitting ? <Loader2 className="animate-spin" size={16} /> : "Submit Inquiry"}
         </button>
       </form>
     </div>
@@ -1246,13 +1327,15 @@ function Footer({ setPage, onOpenContact }) {
             YUMMZO <span style={{ color: "#FFC23C" }}>◕‿◕</span>
           </span>
           <p className="text-sm text-[#241C14]/70 mt-3 max-w-xs leading-relaxed">
-            Crafting innovative, delicious snacks like our Signature Nano Banana Crisps.
+            Crafting innovative, delicious snacks like our Signature Nano Banana Crisps, Peri Peri Makhana, and Jalapeño Jowar Puffs.
           </p>
           <div className="flex gap-3 mt-5">
             {[Instagram, Facebook, Twitter].map((Icon, i) => (
               <a
                 key={i}
-                href="#"
+                href="https://instagram.com/yummzofoods"
+                target="_blank"
+                rel="noreferrer"
                 className="w-9 h-9 rounded-full bg-[#241C14] text-white flex items-center justify-center hover:bg-[#C23B1C] transition-colors"
                 aria-label="social link"
               >
@@ -1294,26 +1377,28 @@ function Footer({ setPage, onOpenContact }) {
         </div>
 
         <div>
-          <h4 className="font-display font-semibold mb-3">Need help?</h4>
+          <h4 className="font-display font-semibold mb-3">Contact & Support</h4>
+          <p className="text-xs text-gray-700 font-semibold mb-1">Yummzo Foods Pvt Ltd</p>
+          <p className="text-xs text-gray-600 mb-2">Gulberg III, Lahore, Pakistan</p>
           <a
-            href="mailto:yummzofoods@gmail.com"
-            className="inline-flex items-center gap-2 text-sm text-[#241C14]/80 hover:text-[#C23B1C] mb-4 block"
+            href="mailto:support@yummzofoods.com"
+            className="inline-flex items-center gap-2 text-xs text-[#241C14]/80 hover:text-[#C23B1C] mb-3 block"
           >
-            <Mail size={16} />
-            yummzofoods@gmail.com
+            <Mail size={14} />
+            support@yummzofoods.com
           </a>
           <button
             onClick={onOpenContact}
             className="bg-[#241C14] text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-[#C23B1C] transition-colors"
           >
-            Send Inquiry
+            Send Message
           </button>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 pt-6 border-t border-[#241C14]/10 text-xs text-[#241C14]/50 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <span>© {new Date().getFullYear()} Yummzo Foods. All rights reserved.</span>
-        <span>Express API + Nano Banana Series</span>
+        <span>© {new Date().getFullYear()} Yummzo Foods Pvt Ltd. All rights reserved.</span>
+        <span>Premium Snack E-Commerce</span>
       </div>
     </footer>
   );
